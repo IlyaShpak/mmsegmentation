@@ -52,7 +52,7 @@ Briefly, it is a deep supervision trick to improve the accuracy. In the training
 In the test script, we provide `--out` argument to control whether output the painted images. Users might run the following command:
 
 ```shell
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} --out ${OUTPUT_DIR}
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py ${CONFIG_FILE} ${CHECKPOINT_FILE} --out ${OUTPUT_DIR}
 ```
 
 ## How to handle binary segmentation task

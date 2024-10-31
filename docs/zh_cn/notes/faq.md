@@ -45,7 +45,7 @@
 在测试脚本中，我们提供了`--out`参数来控制是否输出保存预测的分割掩膜图像。您可以运行以下命令输出测试结果：
 
 ```shell
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} --out ${OUTPUT_DIR}
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py ${CONFIG_FILE} ${CHECKPOINT_FILE} --out ${OUTPUT_DIR}
 ```
 
 更多用例细节可查阅[文档](https://github.com/open-mmlab/mmsegmentation/blob/dev-1.x/docs/zh_cn/user_guides/4_train_test.md#%E6%B5%8B%E8%AF%95%E5%B9%B6%E4%BF%9D%E5%AD%98%E5%88%86%E5%89%B2%E7%BB%93%E6%9E%9C)，[PR #2712](https://github.com/open-mmlab/mmsegmentation/pull/2712) 以及[迁移文档](https://github.com/open-mmlab/mmsegmentation/blob/dev-1.x/docs/zh_cn/migration/interface.md#%E6%B5%8B%E8%AF%95%E5%90%AF%E5%8A%A8)了解相关说明。

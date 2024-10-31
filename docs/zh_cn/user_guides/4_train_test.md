@@ -52,7 +52,7 @@ export CUDA_VISIBLE_DEVICES=-1
 基础用法如下:
 
 ```shell
-python tools/test.py ${配置文件} ${模型权重文件} [可选参数]
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py ${配置文件} ${模型权重文件} [可选参数]
 ```
 
 这个工具有几个可选参数，包括：
@@ -231,13 +231,13 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 MASTER_PORT=29501 sh tools/slurm_train.sh ${
 当需要保存测试输出的分割结果，用 `--out` 指定分割结果输出路径
 
 ```shell
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} --out ${OUTPUT_DIR}
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py ${CONFIG_FILE} ${CHECKPOINT_FILE} --out ${OUTPUT_DIR}
 ```
 
 以保存模型 `fcn_r50-d8_4xb4-80k_ade20k-512x512` 在 ADE20K 验证数据集上的结果为例：
 
 ```shell
-python tools/test.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth --out work_dirs/format_results
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth --out work_dirs/format_results
 ```
 
 或者通过配置文件定义 `output_dir`。例如在 `configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py` 添加 `test_evaluator` 定义：
@@ -249,7 +249,7 @@ test_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'], output_dir='work_d
 然后执行相同功能的命令不需要再使用 `--out`：
 
 ```shell
-python tools/test.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth
 ```
 
 当测试的数据集没有提供标注，评测时没有真值可以参与计算，因此需要设置 `format_only=True`，
@@ -281,7 +281,7 @@ test_dataloader = dict(
 然后执行测试命令：
 
 ```shell
-python tools/test.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth
 ```
 
 ### 测试 Cityscapes 数据集并保存输出分割结果
@@ -313,5 +313,5 @@ test_dataloader = dict(
 然后执行相同的命令，例如：
 
 ```shell
-python tools/test.py configs/fcn/fcn_r18-d8_4xb2-80k_cityscapes-512x1024.py ckpt/fcn_r18-d8_512x1024_80k_cityscapes_20201225_021327-6c50f8b4.pth
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py configs/fcn/fcn_r18-d8_4xb2-80k_cityscapes-512x1024.py ckpt/fcn_r18-d8_512x1024_80k_cityscapes_20201225_021327-6c50f8b4.pth
 ```

@@ -52,7 +52,7 @@ We provide `tools/test.py` to launch training jobs on a single GPU.
 The basic usage is as follows.
 
 ```shell
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments]
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [optional arguments]
 ```
 
 This tool accepts several optional arguments, including:
@@ -226,13 +226,13 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 GPUS=4 MASTER_PORT=29501 sh tools/slurm_train.sh ${
 When you want to save the results, you can use `--out` to specify the output directory.
 
 ```shell
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} --out ${OUTPUT_DIR}
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py ${CONFIG_FILE} ${CHECKPOINT_FILE} --out ${OUTPUT_DIR}
 ```
 
 Here is an example to save the predicted results from model `fcn_r50-d8_4xb4-80k_ade20k-512x512` on ADE20k validatation dataset.
 
 ```shell
-python tools/test.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth --out work_dirs/format_results
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth --out work_dirs/format_results
 ```
 
 You also can modify the config file to define `output_dir`. We also take
@@ -246,7 +246,7 @@ test_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'], output_dir='work_d
 then run command without `--out`:
 
 ```shell
-python tools/test.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth
 ```
 
 If you would like to only save the predicted results without evaluation as annotation is not released by the official dataset, you can set `format_only=True` and modify `test_dataloader`.
@@ -278,7 +278,7 @@ test_dataloader = dict(
 then run test command:
 
 ```shell
-python tools/test.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py configs/fcn/fcn_r50-d8_4xb4-80k_ade20k-512x512.py ckpt/fcn_r50-d8_512x512_80k_ade20k_20200614_144016-f8ac5082.pth
 ```
 
 ### Testing Cityscape dataset and save predicted segment files
@@ -311,5 +311,5 @@ test_dataloader = dict(
 then run test command, for example:
 
 ```shell
-python tools/test.py configs/fcn/fcn_r18-d8_4xb2-80k_cityscapes-512x1024.py ckpt/fcn_r18-d8_512x1024_80k_cityscapes_20201225_021327-6c50f8b4.pth
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py configs/fcn/fcn_r18-d8_4xb2-80k_cityscapes-512x1024.py ckpt/fcn_r18-d8_512x1024_80k_cityscapes_20201225_021327-6c50f8b4.pth
 ```

@@ -13,6 +13,8 @@ from mmcv.transforms import LoadImageFromFile
 from mmseg.registry import TRANSFORMS
 from mmseg.utils import datafrombytes
 
+from geotiff import GeoTiff
+
 try:
     from osgeo import gdal
 except ImportError:
@@ -769,3 +771,176 @@ class LoadImageFromNpyFile(LoadImageFromFile):
         results['img_shape'] = img.shape[:2]
         results['ori_shape'] = img.shape[:2]
         return results
+
+
+@TRANSFORMS.register_module()
+class LoadImageFromGeoTiff(LoadImageFromFile):
+    """Load an image from ``results['img']``.
+
+    Similar with :obj:`LoadImageFromFile`, but the image has been loaded as
+    :obj:`np.ndarray` in ``results['img']``. Can be used when loading image
+    from webcam.
+
+    Required Keys:
+
+    - img
+
+    Modified Keys:
+
+    - img
+    - img_path
+    - img_shape
+    - ori_shape
+
+    Args:
+        to_float32 (bool): Whether to convert the loaded image to a float32
+            numpy array. If set to False, the loaded image is an uint8 array.
+            Defaults to False.
+    """
+
+    def transform(self, results: dict) -> dict:
+        """Transform function to add image meta information.
+
+        Args:
+            results (dict): Result dict with Webcam read image in
+                ``results['img']``.
+
+        Returns:
+            dict: The dict contains loaded image and meta information.
+        """
+        filename = results['img_path']
+        img = GeoTiff(filename, crs_code=4326).read()
+        img = np.array(img)
+        print("img shape", img.shape)
+        if self.to_float32:
+            img = img.astype(np.float32)
+
+        results['reserve_path'] = results['img_path']
+        results['img_path'] = None
+        results['img'] = img
+        results['img_shape'] = img.shape[:2]
+        results['ori_shape'] = img.shape[:2]
+        return results
+
+
+@TRANSFORMS.register_module()
+class LoadAnnotationsGeoTiff(MMCV_LoadAnnotations):
+    """Load annotations for semantic segmentation provided by dataset.
+
+    The annotation format is as the following:
+
+    .. code-block:: python
+
+        {
+            # Filename of semantic segmentation ground truth file.
+            'seg_map_path': 'a/b/c'
+        }
+
+    After this module, the annotation has been changed to the format below:
+
+    .. code-block:: python
+
+        {
+            # in str
+            'seg_fields': List
+             # In uint8 type.
+            'gt_seg_map': np.ndarray (H, W)
+        }
+
+    Required Keys:
+
+    - seg_map_path (str): Path of semantic segmentation ground truth file.
+
+    Added Keys:
+
+    - seg_fields (List)
+    - gt_seg_map (np.uint8)
+
+    Args:
+        reduce_zero_label (bool, optional): Whether reduce all label value
+            by 1. Usually used for datasets where 0 is background label.
+            Defaults to None.
+        imdecode_backend (str): The image decoding backend type. The backend
+            argument for :func:``mmcv.imfrombytes``.
+            See :fun:``mmcv.imfrombytes`` for details.
+            Defaults to 'pillow'.
+        backend_args (dict): Arguments to instantiate a file backend.
+            See https://mmengine.readthedocs.io/en/latest/api/fileio.htm
+            for details. Defaults to None.
+            Notes: mmcv>=2.0.0rc4, mmengine>=0.2.0 required.
+    """
+
+    def __init__(
+        self,
+        reduce_zero_label=None,
+        backend_args=None,
+        imdecode_backend='pillow',
+    ) -> None:
+        super().__init__(
+            with_bbox=False,
+            with_label=False,
+            with_seg=True,
+            with_keypoints=False,
+            imdecode_backend=imdecode_backend,
+            backend_args=backend_args)
+        self.reduce_zero_label = reduce_zero_label
+        if self.reduce_zero_label is not None:
+            warnings.warn('`reduce_zero_label` will be deprecated, '
+                          'if you would like to ignore the zero label, please '
+                          'set `reduce_zero_label=True` when dataset '
+                          'initialized')
+        self.imdecode_backend = imdecode_backend
+
+    def _load_seg_map(self, results: dict) -> None:
+        """Private function to load semantic segmentation annotations.
+
+        Args:
+            results (dict): Result dict from :obj:``mmcv.BaseDataset``.
+
+        Returns:
+            dict: The dict contains loaded semantic segmentation annotations.
+        """
+        try:
+            path = results['seg_map_path']
+        except KeyError:
+            path = results['reserve_path']
+            path = path.replace("images", "masks")
+        try:
+            geo_tiff_seg = GeoTiff(path, crs_code=4326).read()
+            gt_semantic_seg = np.array(geo_tiff_seg)
+            print("Mask shape", gt_semantic_seg.shape)
+        except Exception as ex:
+            print(f'Exception:{ex}')
+        # reduce zero_label
+        try:
+            if self.reduce_zero_label is None:
+                self.reduce_zero_label = results['reduce_zero_label']
+            assert self.reduce_zero_label == results['reduce_zero_label'], \
+                'Initialize dataset with `reduce_zero_label` as ' \
+                f'{results["reduce_zero_label"]} but when load annotation ' \
+                f'the `reduce_zero_label` is {self.reduce_zero_label}'
+            if self.reduce_zero_label:
+                # avoid using underflow conversion
+                gt_semantic_seg[gt_semantic_seg == 0] = 255
+                gt_semantic_seg = gt_semantic_seg - 1
+                gt_semantic_seg[gt_semantic_seg == 254] = 255
+            # modify if custom classes
+            if results.get('label_map', None) is not None:
+                # Add deep copy to solve bug of repeatedly
+                # replace `gt_semantic_seg`, which is reported in
+                # https://github.com/open-mmlab/mmsegmentation/pull/1445/
+                gt_semantic_seg_copy = gt_semantic_seg.copy()
+                for old_id, new_id in results['label_map'].items():
+                    gt_semantic_seg[gt_semantic_seg_copy == old_id] = new_id
+        except KeyError:
+            pass
+        results['gt_seg_map'] = gt_semantic_seg
+        #results['seg_fields'].append('gt_seg_map')
+
+
+    def __repr__(self) -> str:
+        repr_str = self.__class__.__name__
+        repr_str += f'(reduce_zero_label={self.reduce_zero_label}, '
+        repr_str += f"imdecode_backend='{self.imdecode_backend}', "
+        repr_str += f'backend_args={self.backend_args})'
+        return repr_str

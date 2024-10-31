@@ -34,13 +34,13 @@ In order to generate and plot a `nxn` confusion matrix where `n` is the number o
 #### 1.Generate a prediction result in pkl format using `test.py`
 
 ```shell
-python tools/test.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [--out ${PATH_TO_RESULT_FILE}]
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py ${CONFIG_FILE} ${CHECKPOINT_FILE} [--out ${PATH_TO_RESULT_FILE}]
 ```
 
 Example:
 
 ```shell
-python tools/test.py \
+python tools/isanet_r50-d8_4xb2-land_cover_ai-512x1024.py \
 configs/fcn/fcn_r50-d8_4xb2-40k_cityscapes-512x1024.py \
 checkpoint/fcn_r50-d8_512x1024_40k_cityscapes_20200604_192608-efe53f0d.pth \
 --out result/pred_result.pkl
