@@ -900,17 +900,17 @@ class LoadAnnotationsGeoTiff(MMCV_LoadAnnotations):
         Returns:
             dict: The dict contains loaded semantic segmentation annotations.
         """
-        try:
-            path = results['seg_map_path']
-        except KeyError:
+        path = results.get('seg_map_path')
+        if path is None:
+            path = results['reserve_path'].replace("images", "masks")
+        else:
             path = results['reserve_path']
-            path = path.replace("images", "masks")
-        try:
+        if path:
             geo_tiff_seg = GeoTiff(path, crs_code=4326).read()
             gt_semantic_seg = np.array(geo_tiff_seg)
             print("Mask shape", gt_semantic_seg.shape)
-        except Exception as ex:
-            print(f'Exception:{ex}')
+        else:
+            print("Path not found or invalid.")
         # reduce zero_label
         try:
             if self.reduce_zero_label is None:

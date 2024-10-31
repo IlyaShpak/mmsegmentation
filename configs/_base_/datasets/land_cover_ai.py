@@ -1,6 +1,6 @@
 dataset_type = 'LandCoverAi'
 data_root = '/home/ilya/PycharmProjects/mrsis/intership/git_inter/task_3/images/'
-
+env_root = '/home/ilya/PycharmProjects/mrsis/intership/git_inter/task_3'
 # crop_size = (512, 512)
 
 train_pipeline = [
@@ -40,10 +40,10 @@ train_dataloader = dict(
         data_root=data_root,
         reduce_zero_label=True,
         data_prefix=dict(
-            img_path='/home/ilya/PycharmProjects/mrsis/intership/git_inter/task_3/images',
-            seg_map_path='/home/ilya/PycharmProjects/mrsis/intership/git_inter/task_3/masks'
+            img_path=f'{env_root}/images',
+            seg_map_path=f'{env_root}/masks'
         ),
-        ann_file="/home/ilya/PycharmProjects/mrsis/intership/git_inter/task_3/train.txt",
+        ann_file=f'{env_root}/train.txt',
         pipeline=train_pipeline
     )
 )
@@ -58,10 +58,10 @@ val_dataloader = dict(
         data_root=data_root,
         reduce_zero_label=True,
         data_prefix=dict(
-            img_path='/home/ilya/PycharmProjects/mrsis/intership/git_inter/task_3/images',
-            seg_map_path='/home/ilya/PycharmProjects/mrsis/intership/git_inter/task_3/masks'
+            img_path=f'{env_root}/images',
+            seg_map_path=f'{env_root}/masks'
         ),
-        ann_file="/home/ilya/PycharmProjects/mrsis/intership/git_inter/task_3/test.txt",
+        ann_file=f'{env_root}/test.txt',
         pipeline=test_pipeline
     )
 )
